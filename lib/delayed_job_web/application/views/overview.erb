@@ -49,15 +49,20 @@
     <th>Count</th>
   </tr>
 
-  <% delayed_jobs(nil).group(:queue).size.each do |queue, count| %>
+  <% queues = delayed_jobs(nil).distinct(:queue) %>
+  <% queues << nil %>
+
+  <% queues.each do |queue_name| %>
+    <% count = delayed_jobs(nil).where({queue: queue_name}).count %>
+
     <tr>
       <td class="status">
-        <a href="<%= queue_path(queue) %>">
-          <%= queue %>
+        <a href="<%= queue_path(queue_name) %>">
+          <%= queue_name || "Default" %>
         </a>
       </td>
       <td>
-      <%= count %>
+        <%= count %>
       </td>
     </tr>
   <% end %>

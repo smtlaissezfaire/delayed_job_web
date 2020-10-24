@@ -1,6 +1,6 @@
 require 'sinatra/base'
 require 'active_support'
-require 'active_record'
+# require 'active_record'
 require 'delayed_job'
 
 class DelayedJobWeb < Sinatra::Base
@@ -167,9 +167,11 @@ class DelayedJobWeb < Sinatra::Base
     rel =
       case type
       when :working
-        rel.where('locked_at IS NOT NULL AND failed_at IS NULL')
+        rel.
+          where({ locked_at: { '$ne': nil }}).
+          where({failed_at: nil })
       when :failed
-        rel.where('last_error IS NOT NULL')
+        rel.where({ last_error: { '$ne': nil }})
       when :pending
         rel.where(:attempts => 0, :locked_at => nil)
       else
